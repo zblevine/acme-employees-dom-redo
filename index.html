@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            body {
+                font: 20px "Tahoma", sans-serif;
+            }
+            .employee {
+                background-color: skyblue;
+                padding: 1rem;
+                border-radius: 20px;
+                border: 1px solid slategray;
+                width: 25%;
+                margin: 1rem;
+                text-align: center;
+            }
+
+            .favorite {
+                background-color: lightyellow;
+            }
+
+            #employeeList {
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: flex-start;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Acme Employees DOM</h1>
+        <div id="employeeList">
+        </div>
+    </body>
+    <script>
+        const employees = [
+            { id: 1, name: 'moe'},
+            { id: 2, name: 'larry'},
+            { id: 4, name: 'shep'},
+            { id: 3, name: 'curly'},
+            { id: 5, name: 'groucho'},
+            { id: 6, name: 'harpo'},
+            { id: 8, name: 'shep Jr.'},
+            { id: 99, name: 'lucy'}
+        ];
+
+        const employeeList = document.querySelector('#employeeList');
+        employeeList.addEventListener('click', (ev) => {
+            if (ev.target.classList.contains('employee')) {
+                if (!ev.target.classList.contains('favorite') &&
+                    favCount() >= 3) {
+                        alert('Max number of favorites is 3')
+                    } else {
+                        ev.target.classList.toggle('favorite');
+                        updateLocalStorage();
+                    }
+            };
+        });
+
+        const updateLocalStorage = () => {
+            const toStore = [...document.querySelectorAll('.employee')].filter(emplDiv => {
+                return emplDiv.classList.contains('favorite')
+            }).map(emplDiv => parseInt(emplDiv.getAttribute('data-id')));
+            localStorage.setItem('favs', JSON.stringify(toStore));
+        }
+
+        const favCount = () => document.querySelectorAll('.favorite').length;
+
+        const render = (state, container) => {
+            const favs = JSON.parse(localStorage.getItem('favs')) || [];
+            const html = state.map(empl => 
+                `<div class='employee ${favs.includes(empl.id) ? 'favorite' : ''}' data-id='${empl.id}'><span>${empl.name}</span></div>`
+            ).join('');
+            container.innerHTML = html;
+        }
+        
+        render(employees, employeeList);
+    </script>
+</html>
